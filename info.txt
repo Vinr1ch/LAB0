@@ -1,0 +1,2 @@
+remeber these commands
+activate keras-gpu
