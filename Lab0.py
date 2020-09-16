@@ -21,8 +21,8 @@ NUM_CLASSES = 10
 IMAGE_SIZE = 784
 
 # Use these to set the algorithm to use.
-ALGORITHM = "guesser"
-#ALGORITHM = "custom_net"
+#ALGORITHM = "guesser"
+ALGORITHM = "custom_net"
 #ALGORITHM = "tf_net"
 
 
@@ -40,11 +40,11 @@ class NeuralNetwork_2Layer():
 
     # Activation function.
     def __sigmoid(self, x):
-        pass   #TODO: implement
+        return 1 / (1 + np.exp(-x))   #TODO: implement should be done
 
     # Activation prime function.
     def __sigmoidDerivative(self, x):
-        pass   #TODO: implement
+        return x * (1 - x)  #TODO: implement should be done
 
     # Batch generator for mini-batches. Not randomized.
     def __batchGenerator(self, l, n):
