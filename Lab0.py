@@ -147,6 +147,7 @@ def preprocessData(raw):
     yTestP = to_categorical(yTest, NUM_CLASSES)
     xTrainP = xTrain.reshape((60000, 784))
     xTestP = xTest.reshape((10000, 784))
+    #xTrain, xTest = xTrain / 255.0, xTest / 255.0
     print("New shape of xTrain dataset: %s." % str(xTrainP.shape))
     print("New shape of xTest dataset: %s." % str(xTestP.shape))
     print("New shape of yTrain dataset: %s." % str(yTrainP.shape))
@@ -168,7 +169,7 @@ def trainModel(data):
         print(NeuralNetwork.W1)
         print(NeuralNetwork.W2)
 
-        return None
+        return NeuralNetwork
     elif ALGORITHM == "tf_net":
         print("Building and training TF_NN.")
         print("Not yet implemented.")                   #TODO: Write code to build and train your keras neural net.
@@ -179,14 +180,14 @@ def trainModel(data):
 
 
 def runModel(data, model):
-    NeuralNetwork = NeuralNetwork_2Layer(784, 10, 512);
+    #NeuralNetwork = NeuralNetwork_2Layer(784, 10, 512);
     if ALGORITHM == "guesser":
         return guesserClassifier(data)
     elif ALGORITHM == "custom_net":
         print("Testing Custom_NN.")
         #NeuralNetwork.predict(data)
         #print("Not yet implemented.")                   #TODO: Write code to run your custon neural net.
-        return NeuralNetwork.predict(data)
+        return model.predict(data)
     elif ALGORITHM == "tf_net":
         print("Testing TF_NN.")
         print("Not yet implemented.")                   #TODO: Write code to run your keras neural net.
