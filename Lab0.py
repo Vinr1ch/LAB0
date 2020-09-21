@@ -3,6 +3,17 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.utils import to_categorical
+# demonstration of calculating metrics for a neural network model using sklearn
+from sklearn.datasets import make_circles
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import confusion_matrix
+from keras.models import Sequential
+from keras.layers import Dense
 import random
 
 
@@ -60,31 +71,29 @@ class NeuralNetwork_2Layer():
         for iteration in range(mbs):
             #siphon the training data via  the neuron
             batchx = next(gen1)
-            print("testing x")
+            #print("testing x")
             print(str(batchx.shape))
             batchy = next(gen2)
 
             print(str(batchy.shape))
-            
+
             output = self.predict(batchx)
 
             #print(output)
             #computing error rate for back-propagation
             error = batchy - output
-            print("# DEBUG: ")
-            print(str(batchy.shape))
-            print(str(output.shape))
-            print(str(error.shape))
-            delta = error * self.__sigmoidDerivative(output) # applying derivative of sigmoid to error
+            #print("# DEBUG: ")
+            #print(error)
+
+            delta = error * self.__sigmoidDerivative(output)
+             # applying derivative of sigmoid to error
             z2_error = delta.dot(self.W2.T) # z2 error: how much our hidden layer weights contributed to output error
             z2_delta = z2_error*self.__sigmoidDerivative(self.layer1) # applying derivative of sigmoid to z2 error
+            print(z2_delta)
             #performing weight adjustments
-            print("testing change of weight")
-            print(str(z2_delta.shape))
-            print("testing x")
-            print(str(self.W1.shape))
-            print(str(batchx.T.shape))
+
             self.W1 += batchx.T.dot(z2_delta) # adjusting first set (input --> hidden) weights
+            #print(self.W1)
             self.W2 += self.layer1.T.dot(delta) # adjusting second set (hidden --> output) weights
 
                                           #TODO: Implement backprop. allow minibatches. mbs should specify the size of each minibatch.
@@ -156,7 +165,8 @@ def trainModel(data):
         print("implemented.")                   #TODO: Write code to build and train your custon neural net.
         NeuralNetwork.train(xTrain, yTrain)
         print("Ending Weights After Training: ")
-        print(neural_network.synaptic_weights)
+        print(NeuralNetwork.W1)
+        print(NeuralNetwork.W2)
 
         return None
     elif ALGORITHM == "tf_net":
@@ -169,13 +179,14 @@ def trainModel(data):
 
 
 def runModel(data, model):
+    NeuralNetwork = NeuralNetwork_2Layer(784, 10, 512);
     if ALGORITHM == "guesser":
         return guesserClassifier(data)
     elif ALGORITHM == "custom_net":
         print("Testing Custom_NN.")
-        NeuralNetwork.predict(xTest, yTest)
-        print("Not yet implemented.")                   #TODO: Write code to run your custon neural net.
-        return None
+        #NeuralNetwork.predict(data)
+        #print("Not yet implemented.")                   #TODO: Write code to run your custon neural net.
+        return NeuralNetwork.predict(data)
     elif ALGORITHM == "tf_net":
         print("Testing TF_NN.")
         print("Not yet implemented.")                   #TODO: Write code to run your keras neural net.
@@ -187,12 +198,29 @@ def runModel(data, model):
 
 def evalResults(data, preds):   #TODO: Add F1 score confusion matrix here.
     xTest, yTest = data
+    yhat=np.argmax(preds, axis=1)
+    yTestNew = np.argmax(yTest, axis=1)
     acc = 0
-    for i in range(preds.shape[0]):
-        if np.array_equal(preds[i], yTest[i]):   acc = acc + 1
-    accuracy = acc / preds.shape[0]
+    # accuracy: (tp + tn) / (p + n)
+    accuracy = int(sum(yTestNew == yhat) / len(yTestNew) * 100)
+    print('Accuracy: %f' % accuracy)
+    # precision tp / (tp + fp)
+    precision = precision_score(yTestNew, yhat, pos_label = 'positive', average='micro')
+    print('Precision: %f' % precision)
+    # recall: tp / (tp + fn)
+    recall = recall_score(yTestNew, yhat, pos_label='positive', average='micro')
+    print('Recall: %f' % recall)
+    # f1: 2 tp / (2 tp + fp + fn)
+    f1 = f1_score(yTestNew, yhat, pos_label='positive', average='micro')
+    print('F1 score: %f' % f1)
+    cm = confusion_matrix(yTestNew, yhat)
+    print(cm)
+
+    #for i in range(preds.shape[0]):
+    #    if np.array_equal(preds[i], yTest[i]):   acc = acc + 1
+    #accuracy = acc / preds.shape[0]
     print("Classifier algorithm: %s" % ALGORITHM)
-    print("Classifier accuracy: %f%%" % (accuracy * 100))
+    #print("Classifier accuracy: %f%%" % (accuracy * 100))
     print()
 
 
@@ -200,6 +228,7 @@ def evalResults(data, preds):   #TODO: Add F1 score confusion matrix here.
 #=========================<Main>================================================
 
 def main():
+
     raw = getRawData()
     data = preprocessData(raw)
     model = trainModel(data[0])
