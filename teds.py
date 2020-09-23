@@ -7,6 +7,13 @@ from tensorflow.keras.utils import to_categorical
 from keras.datasets import mnist
 from keras.utils import to_categorical
 import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import confusion_matrix
 import random
 
 
@@ -141,13 +148,13 @@ def preprocessData(raw):
     print("New shape of xTest dataset: %s." % str(xTest.shape))
     print("New shape of yTrain dataset: %s." % str(yTrainP.shape))
     print("New shape of yTest dataset: %s." % str(yTestP.shape))
-    return ((xTrain, yTrainP), (xTest, yTestP))
+    return ((xTrainP, yTrainP), (xTestP, yTestP))
 
 
 
 def trainModel(data):
     xTrain, yTrain, = data
-    xTest, yTest = data
+
     if ALGORITHM == "guesser":
         return None   # Guesser has no model, as it is just guessing.
     elif ALGORITHM == "custom_net":
@@ -162,14 +169,15 @@ def trainModel(data):
 
 
         model.fit(xTrain, yTrain, epochs=5)
-        y_pred=model.predict_classes(xTest)
+        print(model.evaluate(xTrain, yTrain))
+        #y_pred=model.predict_classes(xTest)
 
-        yTestNew = np.argmax(yTest, axis=1)
-        con_mat = tf.math.confusion_matrix(labels=yTestNew, predictions=y_pred).numpy()
+        #yTestNew = np.argmax(yTest, axis=1)
+        #con_mat = tf.math.confusion_matrix(labels=yTestNew, predictions=y_pred).numpy()
 
         # Printing the result
-        print('Confusion_matrix: ',con_mat)
-        print("loss: %f\naccuracy: %f" % tuple(model.evaluate(xTest, yTest)))
+        #print('Confusion_matrix: ',con_mat)
+        #print("loss: %f\naccuracy: %f" % tuple(model.evaluate(data)))
 
         return model
     else:
@@ -178,7 +186,7 @@ def trainModel(data):
 
 
 def runModel(data, model):
-    #xTest, yTest = data
+    xTest = data
     if ALGORITHM == "guesser":
         return guesserClassifier(data)
     elif ALGORITHM == "custom_net":
@@ -186,9 +194,11 @@ def runModel(data, model):
         print("Not yet implemented.")                   #TODO: Write code to run your custon neural net.
         return None
     elif ALGORITHM == "tf_net":
-        print("Testing TF_NN.")
-        print("loss: %f\naccuracy: %f" % tuple(model.evaluate(data)))
-        return tuple(model.evaluate(data))
+        print("# DEBUG: ")
+        print(model.predict_classes(xTest))
+
+
+        return model.predict_classes(xTest)
     else:
         raise ValueError("Algorithm not recognized.")
 
@@ -209,7 +219,31 @@ def evalResults(data, preds):   #TODO: Add F1 score confusion matrix here.
         print("Not yet implemented.")                   #TODO: Write code to run your custon neural net.
         return None
     elif ALGORITHM == "tf_net":
-        print("Testing TF_NN.")
+        xTest, yTest = data
+        yhat=preds
+        yTestNew = np.argmax(yTest, axis=1)
+        acc = 0
+        # accuracy: (tp + tn) / (p + n)
+        accuracy = int(sum(yTestNew == yhat) / len(yTestNew) * 100)
+        print('Accuracy: %f' % accuracy)
+        # precision tp / (tp + fp)
+        precision = precision_score(yTestNew, yhat, pos_label = 'positive', average='micro')
+        print('Precision: %f' % precision)
+        # recall: tp / (tp + fn)
+        recall = recall_score(yTestNew, yhat, pos_label='positive', average='micro')
+        print('Recall: %f' % recall)
+        # f1: 2 tp / (2 tp + fp + fn)
+        f1 = f1_score(yTestNew, yhat, pos_label='positive', average='micro')
+        print('F1 score: %f' % f1)
+        cm = confusion_matrix(yTestNew, yhat)
+        print(cm)
+
+        #for i in range(preds.shape[0]):
+        #    if np.array_equal(preds[i], yTest[i]):   acc = acc + 1
+        #accuracy = acc / preds.shape[0]
+        print("Classifier algorithm: %s" % ALGORITHM)
+        #print("Classifier accuracy: %f%%" % (accuracy * 100))
+        print()
 
 
         return None
@@ -225,8 +259,11 @@ def main():
     raw = getRawData()
     data = preprocessData(raw)
     model = trainModel(data[0])
+    print(str(data[0][0].shape))
+    print(str(data[1][0].shape))
     preds = runModel(data[1][0], model)
-    "loss: %f\naccuracy: %f" % tuple(model.evaluate(data))
+    print(model.predict_classes(data[1][0]))
+    #"loss: %f\naccuracy: %f" % tuple(model.evaluate(data))
     evalResults(data[1], preds)
 
 

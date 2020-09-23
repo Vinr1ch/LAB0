@@ -63,40 +63,48 @@ class NeuralNetwork_2Layer():
             yield l[i : i + n]
 
     # Training with backpropagation.
-    def train(self, xVals, yVals, epochs = 100000, minibatches = True, mbs = 100):
+    def train(self, xVals, yVals, epochs = 200, minibatches = True, mbs = 100):
         #training the model to make accurate predictions while adjusting weights continually
         gen1 = self.__batchGenerator(xVals, mbs)
         gen2 = self.__batchGenerator(yVals, mbs)
 
-        for iteration in range(mbs):
+        for iteration in range(epochs):
+            gen1 = self.__batchGenerator(xVals, mbs)
+            gen2 = self.__batchGenerator(yVals, mbs)
             #siphon the training data via  the neuron
-            batchx = next(gen1)
-            #print("testing x")
-            print(str(batchx.shape))
-            batchy = next(gen2)
+            for iteration in range(600):
+                batchx = next(gen1)
+                #print("testing x")
+                #print(str(batchx.shape))
+                batchy = next(gen2)
 
-            print(str(batchy.shape))
+                #print(str(batchy.shape))
 
-            output = self.predict(batchx)
+                output = self.predict(batchx)
 
-            #print(output)
-            #computing error rate for back-propagation
-            error = batchy - output
-            #print("# DEBUG: ")
-            #print(error)
+                #print(output)
+                #computing error rate for back-propagation
+                error = batchy - output
+                #print("# DEBUG: ")
+                #print(error)
 
-            delta = error * self.__sigmoidDerivative(output)
-             # applying derivative of sigmoid to error
-            z2_error = delta.dot(self.W2.T) # z2 error: how much our hidden layer weights contributed to output error
-            z2_delta = z2_error*self.__sigmoidDerivative(self.layer1) # applying derivative of sigmoid to z2 error
-            print(z2_delta)
-            #performing weight adjustments
+                delta = error * self.__sigmoidDerivative(output)
+                 # applying derivative of sigmoid to error
+                z2_error = delta.dot(self.W2.T) # z2 error: how much our hidden layer weights contributed to output error
+                z2_delta = z2_error*self.__sigmoidDerivative(self.layer1) # applying derivative of sigmoid to z2 error
+                #print(z2_delta)
+                #performing weight adjustments
+                tempW = np.copy(self.W1)
+                self.W1 += batchx.T.dot(z2_delta) * 0.008# adjusting first set (input --> hidden) weights
 
-            self.W1 += batchx.T.dot(z2_delta) # adjusting first set (input --> hidden) weights
-            #print(self.W1)
-            self.W2 += self.layer1.T.dot(delta) # adjusting second set (hidden --> output) weights
-
-                                          #TODO: Implement backprop. allow minibatches. mbs should specify the size of each minibatch.
+                #print(self.W1)
+                self.W2 += self.layer1.T.dot(delta) * 0.008# adjusting second set (hidden --> output) weights
+                comparsion = self.W1 == tempW
+                #if comparsion.all():
+                #    print(True)
+                #else:
+                #    print(False)
+                                              #TODO: Implement backprop. allow minibatches. mbs should specify the size of each minibatch.
 
 
 
@@ -104,8 +112,8 @@ class NeuralNetwork_2Layer():
     # Forward pass.
     def __forward(self, input):
         input = input.astype(float)
-        print(str(input.shape))
-        print(str(self.W1.shape))
+        #print(str(input.shape))
+        #print(str(self.W1.shape))
         self.layer1 = self.__sigmoid(np.dot(input, self.W1))
         layer2 = self.__sigmoid(np.dot(self.layer1, self.W2))
         return self.layer1, layer2
@@ -147,7 +155,7 @@ def preprocessData(raw):
     yTestP = to_categorical(yTest, NUM_CLASSES)
     xTrainP = xTrain.reshape((60000, 784))
     xTestP = xTest.reshape((10000, 784))
-    #xTrain, xTest = xTrain / 255.0, xTest / 255.0
+    xTrain, xTest = xTrain / 255.0, xTest / 255.0
     print("New shape of xTrain dataset: %s." % str(xTrainP.shape))
     print("New shape of xTest dataset: %s." % str(xTestP.shape))
     print("New shape of yTrain dataset: %s." % str(yTrainP.shape))
@@ -168,6 +176,16 @@ def trainModel(data):
         print("Ending Weights After Training: ")
         print(NeuralNetwork.W1)
         print(NeuralNetwork.W2)
+        preds = NeuralNetwork.predict(xTrain)
+
+        yhat=np.argmax(preds, axis=1)
+        print(yhat)
+        yTestNew = np.argmax(yTrain, axis=1)
+        print(yTestNew)
+        acc = 0
+        # accuracy: (tp + tn) / (p + n)
+        accuracy = int(sum(yTestNew == yhat) / len(yTestNew) * 100)
+        print('Accuracy: %f' % accuracy)
 
         return NeuralNetwork
     elif ALGORITHM == "tf_net":
