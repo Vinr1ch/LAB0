@@ -1,0 +1,62 @@
+Name: Colin Vinarcik
+Purdue email: cvinarci@purdue.edu
+Link to your git repo: https://github.com/Vinr1ch/LAB0
+
+List of resources used:
+https://www.kdnuggets.com/2018/10/simple-neural-network-python.html - used to look at single layer neural NeuralNetwork
+and how it is used to get a final output.
+
+~~~~~List of parts of the lab completed~~~~~~~
+[5] Sigmoid and sigmoid derivative functions.
+[10] Train function (using backpropagation properly).
+Accuracy should be at least 85%.
+[15] Fully functioning 2-layer neural net. Add this model into the pipeline such that it is chosen when ALGORITHM = "custom_net".
+[30] Implement a function that builds a 2 layer neural net using either Tensorflow or Keras. Add this model into the pipeline such that it is chosen when ALGORITHM = "tf_net".
+[5] The image data values are between 0 and 255. Preprocess this such that values are between 0.0 and 1.0.
+[15] Create an F1 score confusion matrix in the evaluation function. It should be printed along with accuracy.
+[20] Report.
+
+
+
+
+~~~~~~A small summary of how you made each neural net~~~~~~~
+For the tensor flow natural network, I used the slides to see a basic TF model that is made.
+I used the test code that was asked to show proper set up of our environment, and modified
+to meet the requirements of 2 layer network.  I used office hours to better understand the
+flow of the code, and proper transition through the different functions.  For this 2 layer
+network, I used activation function of relu, and trained it for accuracy.  After compiling
+the model, I ran a 10 epoch training of the network on the training data set.
+
+For the custom network I first added in the activation functions, so that forward propagation
+would work correctly.  I then started on the Train function, which create a batch generator
+for our program.  For each epoch we run through the 600 batches of our training set.
+From this point we do forward propagation.  This allows us to create our error value, and
+find our delta values to help define our new weights.  With the changing of the Weights,
+we also had to multiply them by the learning rate.  After completion of the training we
+return the model, for testing of our network.  This then goes through the rest of the flow
+of them program printing the accuracy and finally f1 confusion matrix.
+
+~~~~~Include relevant outputs (e.g. confusion matrix, metrics, plots, generated outputs)~~~~
+
+===== Output from TF =========
+[7 2 1 ... 4 5 6]
+Accuracy: 95.000000
+C:\Users\vinri\anaconda3\envs\keras-gpu\lib\site-packages\sklearn\metrics\_classification.py:1270: UserWarning: Note that pos_label (set to 'positive') is ignored when average != 'binary' (got 'micro'). You may use labels=[pos_label] to specify a single positive class.
+  % (pos_label, average), UserWarning)
+Precision: 0.956900
+Recall: 0.956900
+F1 score: 0.956900
+[[ 968    0    0    2    0    1    1    2    6    0]
+ [   0 1115    3    2    0    0    2    0   13    0]
+ [   3    0  983   15    0    0    1    6   24    0]
+ [   2    0    8  977    1    5    0    3   14    0]
+ [   1    0    5    1  938    1    2    5   10   19]
+ [   1    0    0   32    1  821    4    3   26    4]
+ [   5    4    3    1    2   15  910    0   18    0]
+ [   3    5   11    5    3    0    0  985    9    7]
+ [   4    0    3   10    6    6    2    3  939    1]
+ [   2    5    0   10   10    3    0    4   42  933]]
+Classifier algorithm: tf_net
+
+
+===== Output from custom =========
