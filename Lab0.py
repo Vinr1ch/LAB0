@@ -64,7 +64,7 @@ class NeuralNetwork_2Layer():
             yield l[i : i + n]
 
     # Training with backpropagation.
-    def train(self, xVals, yVals, epochs = 2, minibatches = True, mbs = 100):
+    def train(self, xVals, yVals, epochs = 200, minibatches = True, mbs = 100):
         #training the model to make accurate predictions while adjusting weights continually
 
         for iteration in range(epochs):
@@ -72,19 +72,14 @@ class NeuralNetwork_2Layer():
             gen2 = self.__batchGenerator(yVals, mbs)
             for iteration in range(600):
                 batchx = next(gen1)
-                #print("testing x")
-                #print(str(batchx.shape))
-                batchy = next(gen2)
 
-                #print(str(batchy.shape))
+                batchy = next(gen2)
 
                 output = self.predict(batchx)
 
-                #print(output)
+
                 #computing error rate for back-propagation
                 error = batchy - output
-                #print("# DEBUG: ")
-                #print(error)
 
                 delta = error * self.__sigmoidDerivative(output)
                  # applying derivative of sigmoid to error
@@ -94,9 +89,8 @@ class NeuralNetwork_2Layer():
                 tempW = np.copy(self.W1)
                 self.W1 += batchx.T.dot(z2_delta) * self.lr # adjusting first weights
 
-                #print(self.W1)
                 self.W2 += self.layer1.T.dot(delta) * self.lr# adjusting second weights
-                comparsion = self.W1 == tempW
+                #comparsion = self.W1 == tempW
                 #if comparsion.all():
                 #    print(True)
                 #else:
@@ -109,8 +103,7 @@ class NeuralNetwork_2Layer():
     # Forward pass.
     def __forward(self, input):
         input = input.astype(float)
-        #print(str(input.shape))
-        #print(str(self.W1.shape))
+
         self.layer1 = self.__sigmoid(np.dot(input, self.W1))
         layer2 = self.__sigmoid(np.dot(self.layer1, self.W2))
         return self.layer1, layer2

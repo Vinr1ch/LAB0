@@ -60,3 +60,24 @@ Classifier algorithm: tf_net
 
 
 ===== Output from custom =========
+[5 0 3 ... 5 6 9]
+[5 0 4 ... 5 6 8]
+Accuracy: 77.000000
+Testing Custom_NN.
+Accuracy: 76.000000
+C:\Users\vinri\anaconda3\envs\keras-gpu\lib\site-packages\sklearn\metrics\_classification.py:1270: UserWarning: Note that pos_label (set to 'positive') is ignored when average != 'binary' (got 'micro'). You may use labels=[pos_label] to specify a single positive class.
+  % (pos_label, average), UserWarning)
+Precision: 0.768500
+Recall: 0.768500
+F1 score: 0.768500
+[[ 960    0    0    1    0    4   13    1    0    1]
+ [   0 1125    2    2    0    1    4    0    0    1]
+ [  16    4  969   14    0    2   13   11    0    3]
+ [   2    0   15  952    0   24    4    5    0    8]
+ [  11   12   63   40    0   88  149   96    0  523]
+ [   7    4    1   22    0  831   15    5    0    7]
+ [  12    3    3    0    0   11  928    1    0    0]
+ [   2   10   16    8    0    1    0  967    0   24]
+ [  37   33   94  231    0  310   76   15    0  178]
+ [   8    9    2    9    0   18    3    7    0  953]]
+Classifier algorithm: custom_net
